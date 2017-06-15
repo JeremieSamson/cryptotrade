@@ -1,0 +1,8 @@
+services:
+    trade.currency.helper:
+        class: AppBundle\Service\Helper\CurrencyHelper
+        arguments: []
+
+    trade.currency.wrapper:
+        class: AppBundle\Service\Wrapper\CurrencyWrapper
+        arguments: ['@trade.currency.helper']
