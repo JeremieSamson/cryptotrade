@@ -65,11 +65,19 @@ class CryptoCurrency
     private $orders;
 
     /**
+     * @var ArrayCollection
+     *
+     * @ORM\OneToMany(targetEntity="AppBundle\Entity\CurrencySell", mappedBy="currency")
+     */
+    private $sells;
+
+    /**
      * CryptoCurrency constructor.
      */
     public function __construct()
     {
         $this->orders = new ArrayCollection();
+        $this->sells = new ArrayCollection();
     }
 
     /**
@@ -251,6 +259,37 @@ class CryptoCurrency
         }
 
         return $price;
+    }
+
+    /**
+     * @param CurrencySell $sell
+     *
+     * @return $this
+     */
+    public function addSell(CurrencySell $sell){
+        $this->orders->add($sell);
+
+        $sell->setCurrency($this);
+
+        return $this;
+    }
+
+    /**
+     * @param CurrencySell $sell
+     *
+     * @return $this
+     */
+    public function removeSell(CurrencySell $sell){
+        $this->orders->removeElement($sell);
+
+        return $this;
+    }
+
+    /**
+     * @return ArrayCollection
+     */
+    public function getSells(){
+        return $this->sells;
     }
 }
 

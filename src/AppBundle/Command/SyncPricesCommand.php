@@ -33,14 +33,18 @@ class SyncPricesCommand extends ContainerAwareCommand
     {
         // Showing when the script is launched
         $now = new \DateTime();
-        $output->writeln('<comment>Start : ' . $now->format('d-m-Y G:i:s') . ' ---</comment>');
+
+        if ($output->getVerbosity() >= OutputInterface::VERBOSITY_VERY_VERBOSE)
+            $output->writeln('<comment>Start : ' . $now->format('d-m-Y G:i:s') . ' ---</comment>');
 
         // Executing sync
         $this->sync($input, $output);
 
         // Showing when the script is over
         $now = new \DateTime();
-        $output->writeln('<comment>End : ' . $now->format('d-m-Y G:i:s') . ' ---</comment>');
+
+        if ($output->getVerbosity() >= OutputInterface::VERBOSITY_VERY_VERBOSE)
+            $output->writeln('<comment>End : ' . $now->format('d-m-Y G:i:s') . ' ---</comment>');
     }
 
     /**
@@ -65,7 +69,7 @@ class SyncPricesCommand extends ContainerAwareCommand
                 try{
                     $value = $currencyWrapper->$functionName();
 
-                    if ($output->getVerbosity() >= OutputInterface::VERBOSITY_VERBOSE)
+                    if ($currency->getValue() != $value && $output->getVerbosity() >= OutputInterface::VERBOSITY_VERBOSE)
                         $output->writeln("<comment>" . $currency->getAcronym() . " value updated from " . $currency->getValue() . " to " . $value . "</comment>");
 
                     $currency->setValue($value);

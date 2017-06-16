@@ -34,14 +34,18 @@ class TradeCommand extends ContainerAwareCommand
     {
         // Showing when the script is launched
         $now = new \DateTime();
-        $output->writeln('<comment>Start : ' . $now->format('d-m-Y G:i:s') . ' ---</comment>');
+
+        if ($output->getVerbosity() >= OutputInterface::VERBOSITY_VERY_VERBOSE)
+            $output->writeln('<comment>Start : ' . $now->format('d-m-Y G:i:s') . ' ---</comment>');
 
         // Executing sync
         $this->trade($input, $output);
 
         // Showing when the script is over
         $now = new \DateTime();
-        $output->writeln('<comment>End : ' . $now->format('d-m-Y G:i:s') . ' ---</comment>');
+
+        if ($output->getVerbosity() >= OutputInterface::VERBOSITY_VERY_VERBOSE)
+            $output->writeln('<comment>End : ' . $now->format('d-m-Y G:i:s') . ' ---</comment>');
     }
 
     /**
@@ -82,12 +86,13 @@ class TradeCommand extends ContainerAwareCommand
         }
 
         foreach($currencies as $currency) {
+            $valueBought = round($avgBought[$currency->getAcronym()], 2);
+
             if ($avgBought[$currency->getAcronym()] < $currency->getValue()) {
-                $output->writeln("<comment>" . $currency->getAcronym() . " is higher than when you bought it : " . $avgBought[$currency->getAcronym()] . "€ and current value is " . $currency->getValue() . "€</comment>");
                 $total = $currency->getValue() * $currency->getQuantity() - $currency->getPriceBought();
-                $output->writeln("<comment>If you sell it now you will get " . round($total, 2). "€</comment>");
+                $output->writeln("<comment>[" . $currency->getAcronym() . "] " .$valueBought . "€ > " . $currency->getValue() . "€ => EARN : " . round($total, 2) . "€</comment>");
             } else {
-                $output->writeln("<error>" . $currency->getAcronym() . " can't be selled now, bought at : " . $avgBought[$currency->getAcronym()] . "€ and current value is " . $currency->getValue(). "€</error>");
+                $output->writeln("<error>[" . $currency->getAcronym() . "] " . $valueBought . "€ < " . $currency->getValue(). "€</error>");
             }
         }
     }
