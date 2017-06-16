@@ -39,3 +39,7 @@
 
 # Backup entities generated with doctrine:generate:entities command
 **/Entity/*~
+Supprimerait vendor/doctrine/orm/docs/en/_theme/
+Supprimerait vendor/guzzlehttp/guzzle/build/
+Supprimerait vendor/guzzlehttp/guzzle/docs/
+Supprimerait vendor/guzzlehttp/guzzle/tests/
