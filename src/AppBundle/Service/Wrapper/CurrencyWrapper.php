@@ -24,21 +24,7 @@ class CurrencyWrapper
     /**
      * @return int
      */
-    public function getCurrentPriceForBTC(){
-        return $this->helper->getCurrentPrice("BTC");
-    }
-
-    /**
-     * @return int
-     */
-    public function getCurrentPriceForETH(){
-        return $this->helper->getCurrentPrice("ETH");
-    }
-
-    /**
-     * @return int
-     */
-    public function getCurrentPriceForLTC(){
-        return $this->helper->getCurrentPrice("LTC");
+    public function getCoinCurrentPrice($acronym){
+        return $this->helper->getCurrentPrice($acronym);
     }
 }

@@ -1,4 +1,5 @@
 services:
+    # HELPER / WRAPPER
     trade.currency.helper:
         class: AppBundle\Service\Helper\CurrencyHelper
         arguments: []
@@ -6,3 +7,30 @@ services:
     trade.currency.wrapper:
         class: AppBundle\Service\Wrapper\CurrencyWrapper
         arguments: ['@trade.currency.helper']
+
+    twitter.helper:
+        class: AppBundle\Service\Helper\TwitterHelper
+        arguments: ['%twitter_consumer_key%', '%twitter_consumer_secret%', '%twitter_access_token%', '%twitter_access_token_secret%']
+
+    twitter.wrapper:
+        class: AppBundle\Service\Wrapper\TwitterWrapper
+        arguments: ['@twitter.helper']
+
+    coincap.helper:
+            class: AppBundle\Service\Helper\CoinCapHelper
+            arguments: []
+
+    coincap.wrapper:
+        class: AppBundle\Service\Wrapper\CoinCapWrapper
+        arguments: ['@coincap.helper']
+
+    blockchaininfo.helper:
+        class: AppBundle\Service\Helper\BlockChainInfoHelper
+        arguments: ['@coincap.helper']
+
+    # GLOBAL SERVICES
+    global.webservice:
+        class: AppBundle\Service\WebService
+
+    global.websitegrabber:
+        class: AppBundle\Service\Grabber\WebsiteGrabber

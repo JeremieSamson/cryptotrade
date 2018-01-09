@@ -3,6 +3,7 @@
 namespace AppBundle\Command;
 
 use AppBundle\Entity\CryptoCurrency;
+use AppBundle\Service\Wrapper\CoinCapWrapper;
 use AppBundle\Service\Wrapper\CurrencyWrapper;
 use Doctrine\ORM\EntityManager;
 use Symfony\Bundle\FrameworkBundle\Command\ContainerAwareCommand;
@@ -28,6 +29,8 @@ class SyncPricesCommand extends ContainerAwareCommand
     /**
      * @param InputInterface  $input
      * @param OutputInterface $output
+     *
+     * @return void
      */
     protected function execute(InputInterface $input, OutputInterface $output)
     {
@@ -58,29 +61,25 @@ class SyncPricesCommand extends ContainerAwareCommand
 
         $currencies = $em->getRepository("AppBundle:CryptoCurrency")->findAll();
 
-        /** @var CurrencyWrapper $currencyWrapper */
-        $currencyWrapper = $this->getContainer()->get('trade.currency.wrapper');
+        /** @var CoinCapWrapper $currencyWrapper */
+        $currencyWrapper = $this->getContainer()->get('coincap.wrapper');
 
         /** @var CryptoCurrency $currency */
         foreach($currencies as $currency) {
-            $functionName = "getCurrentPriceFor" . strtolower($currency->getAcronym());
+            try{
+                $value = $currencyWrapper->getPrice($currency);
 
-            if (method_exists($currencyWrapper, $functionName)) {
-                try{
-                    $value = $currencyWrapper->$functionName();
-
-                    if ($currency->getValue() != $value && $output->getVerbosity() >= OutputInterface::VERBOSITY_VERBOSE)
+                if (is_float($value)) {
+                    if ($output->getVerbosity() >= OutputInterface::VERBOSITY_VERBOSE)
                         $output->writeln("<comment>" . $currency->getAcronym() . " value updated from " . $currency->getValue() . " to " . $value . "</comment>");
 
                     $currency->setValue($value);
-                }catch(\Exception $e){
-                    $output->writeln("<error>Can't get current price of " . $currency->getAcronym() . " : " . $e->getMessage() . "</error>");
                 }
-            } else {
-                throw new \Exception(sprintf('Currency Wrapper doesn\'t have function with name %s', $functionName));
+            }catch(\Exception $e){
+                $output->writeln("<error>Can't get current price of " . $currency->getAcronym() . " : " . $e->getMessage() . "</error>");
             }
-        }
 
-        $em->flush();
+            $em->flush();
+        }
     }
 }

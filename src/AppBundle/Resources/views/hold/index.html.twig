@@ -1,0 +1,33 @@
+{% extends 'AppBundle::content.html.twig' %}
+
+{% block content_title %}Hold{% endblock %}
+
+{% block panel %}
+    {% for holding in holdings %}
+        <h1>{{ holding.from }}</h1>
+        <div id="donut-{{ holding.from }}"></div>
+    {% endfor %}
+{% endblock %}
+
+{% block content_js %}
+    <script>
+        $( document ).ready(function() {
+            Morris.Donut(
+                {% for holding in holdings %}
+                    {
+                        element: 'donut-{{ holding.from }}',
+                        data: [
+                            {% for cryptoAmount in holding.holdingCryptoAmounts %}
+                                {
+                                    label: "{{ cryptoAmount.cryptoCurrency.name }}",
+                                    value: {{ cryptoAmount.amount }}
+                                }{% if not loop.last %},{% endif %}
+                            {% endfor %}
+                        ],
+                        resize: true
+                    }{% if not loop.last %},{% endif %}
+                {% endfor %}
+            );
+        });
+    </script>
+{% endblock %}

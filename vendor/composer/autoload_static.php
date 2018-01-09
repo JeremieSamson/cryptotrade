@@ -73,6 +73,11 @@ class ComposerStaticInitce32f360f39707201d89a619cd8d8bbb
         'F' => 
         array (
             'Fig\\Link\\' => 9,
+            'FOS\\UserBundle\\' => 15,
+        ),
+        'E' => 
+        array (
+            'Endroid\\Twitter\\' => 16,
         ),
         'D' => 
         array (
@@ -214,6 +219,14 @@ class ComposerStaticInitce32f360f39707201d89a619cd8d8bbb
         array (
             0 => __DIR__ . '/..' . '/fig/link-util/src',
         ),
+        'FOS\\UserBundle\\' => 
+        array (
+            0 => __DIR__ . '/..' . '/friendsofsymfony/user-bundle',
+        ),
+        'Endroid\\Twitter\\' => 
+        array (
+            0 => __DIR__ . '/..' . '/endroid/twitter/src',
+        ),
         'Doctrine\\Instantiator\\' => 
         array (
             0 => __DIR__ . '/..' . '/doctrine/instantiator/src/Doctrine/Instantiator',
@@ -288,6 +301,13 @@ class ComposerStaticInitce32f360f39707201d89a619cd8d8bbb
             'Doctrine\\Common\\Annotations\\' => 
             array (
                 0 => __DIR__ . '/..' . '/doctrine/annotations/lib',
+            ),
+        ),
+        'B' => 
+        array (
+            'Buzz' => 
+            array (
+                0 => __DIR__ . '/..' . '/kriswallsmith/buzz/lib',
             ),
         ),
     );

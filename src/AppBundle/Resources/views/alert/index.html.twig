@@ -1,0 +1,15 @@
+{% extends 'AppBundle::content.html.twig' %}
+
+{% block content_title %}Alert{% endblock %}
+
+{% block panel %}
+    <div class="list-group">
+        {% for alert in alerts %}
+            <a href="{{ alert.url }}" class="list-group-item">
+                {{ alert.author }} : <i class="fa fa-twitter fa-fw"></i> {{ alert.value }}
+                <span class="pull-right text-muted small"><em>4 minutes ago</em>
+                </span>
+            </a>
+        {% endfor %}
+    </div>
+{% endblock %}

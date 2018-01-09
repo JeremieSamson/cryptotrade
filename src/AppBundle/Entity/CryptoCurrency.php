@@ -2,6 +2,7 @@
 
 namespace AppBundle\Entity;
 
+use AppBundle\Entity\Traits\TimestampableTrait;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\ORM\Mapping as ORM;
 
@@ -10,9 +11,13 @@ use Doctrine\ORM\Mapping as ORM;
  *
  * @ORM\Table(name="trade_crypto_currency")
  * @ORM\Entity(repositoryClass="AppBundle\Repository\CryptoCurrencyRepository")
+ *
+ * @ORM\HasLifecycleCallbacks()
  */
 class CryptoCurrency
 {
+    use TimestampableTrait;
+
     /**
      * @var int
      *
@@ -25,12 +30,12 @@ class CryptoCurrency
     /**
      * @var string
      *
-     * @ORM\Column(name="name", type="string", length=255, unique=true)
+     * @ORM\Column(name="name", type="string", length=255)
      */
     private $name;
 
     /**
-     * @var int
+     * @var float
      *
      * @ORM\Column(name="value", type="float")
      */
@@ -39,23 +44,16 @@ class CryptoCurrency
     /**
      * @var string
      *
-     * @ORM\Column(name="acronym", type="string", length=3, unique=true)
+     * @ORM\Column(name="acronym", type="string", length=255, unique=true)
      */
     private $acronym;
 
     /**
-     * @var \DateTime
+     * @var ArrayCollection
      *
-     * @ORM\Column(name="createdAt", type="datetime")
+     * @ORM\OneToMany(targetEntity="AppBundle\Entity\HoldingCryptoAmount", mappedBy="cryptoCurrency")
      */
-    private $createdAt;
-
-    /**
-     * @var \DateTime
-     *
-     * @ORM\Column(name="updatedAt", type="datetime")
-     */
-    private $updatedAt;
+    private $holdingCryptoAmount;
 
     /**
      * @var ArrayCollection
@@ -139,7 +137,7 @@ class CryptoCurrency
     }
 
     /**
-     * @return int
+     * @return float
      */
     public function getValue()
     {
@@ -147,59 +145,11 @@ class CryptoCurrency
     }
 
     /**
-     * @param int $value
+     * @param float $value
      */
     public function setValue($value)
     {
         $this->value = $value;
-    }
-
-    /**
-     * Set createdAt
-     *
-     * @param \DateTime $createdAt
-     *
-     * @return CryptoCurrency
-     */
-    public function setCreatedAt($createdAt)
-    {
-        $this->createdAt = $createdAt;
-
-        return $this;
-    }
-
-    /**
-     * Get createdAt
-     *
-     * @return \DateTime
-     */
-    public function getCreatedAt()
-    {
-        return $this->createdAt;
-    }
-
-    /**
-     * Set updatedAt
-     *
-     * @param \DateTime $updatedAt
-     *
-     * @return CryptoCurrency
-     */
-    public function setUpdatedAt($updatedAt)
-    {
-        $this->updatedAt = $updatedAt;
-
-        return $this;
-    }
-
-    /**
-     * Get updatedAt
-     *
-     * @return \DateTime
-     */
-    public function getUpdatedAt()
-    {
-        return $this->updatedAt;
     }
 
     /**
@@ -290,6 +240,37 @@ class CryptoCurrency
      */
     public function getSells(){
         return $this->sells;
+    }
+
+    /**
+     * @param HoldingCryptoAmount $cryptoAmount
+     *
+     * @return CryptoCurrency
+     */
+    public function addHoldingCryptoAmount(HoldingCryptoAmount $cryptoAmount){
+        $this->holdingCryptoAmount->add($cryptoAmount);
+
+        $cryptoAmount->setCryptoCurrency($this);
+
+        return $this;
+    }
+
+    /**
+     * @param HoldingCryptoAmount $cryptoAmount
+     *
+     * @return CryptoCurrency
+     */
+    public function removeHoldingCryptoAmount(HoldingCryptoAmount $cryptoAmount){
+        $this->holdingCryptoAmount->removeElement($cryptoAmount);
+
+        return $this;
+    }
+
+    /**
+     * @return ArrayCollection
+     */
+    public function getHoldingCryptoAmount(){
+        return $this->holdingCryptoAmount;
     }
 }
 
