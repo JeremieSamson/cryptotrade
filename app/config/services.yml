@@ -28,6 +28,14 @@ services:
         class: AppBundle\Service\Helper\BlockChainInfoHelper
         arguments: ['@coincap.helper']
 
+    synchroniser:
+        class: AppBundle\Service\Synchroniser
+        arguments: ['@cryptobox.entity_manager', '@twitter.wrapper', '@coincap.wrapper']
+
+    cryptobox.entity_manager:
+        class: AppBundle\Service\EntityManager
+        arguments: ['@doctrine.orm.entity_manager']
+
     # GLOBAL SERVICES
     global.webservice:
         class: AppBundle\Service\WebService

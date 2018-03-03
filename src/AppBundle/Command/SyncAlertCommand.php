@@ -3,6 +3,7 @@
 namespace AppBundle\Command;
 
 use AppBundle\Entity\Alert\TwitterAlert;
+use AppBundle\Service\Synchroniser;
 use Doctrine\ORM\EntityManager;
 use MainBundle\Entity\BonDeLivraison;
 use MainBundle\Entity\Chantier;
@@ -24,7 +25,7 @@ class SyncAlertCommand extends ContainerAwareCommand
     public function configure()
     {
         $this
-            ->setName('sync:alert')
+            ->setName('cryptobox:sync')
             ->setDescription('Sync alerts')
         ;
     }
@@ -40,7 +41,7 @@ class SyncAlertCommand extends ContainerAwareCommand
         // Showing when the script is launched
         $now = new \DateTime();
 
-        if ($output->getVerbosity() >= OutputInterface::VERBOSITY_VERY_VERBOSE)
+        if ($output->getVerbosity() >= OutputInterface::VERBOSITY_VERBOSE)
             $output->writeln('<comment>Start : ' . $now->format('d-m-Y G:i:s') . ' ---</comment>');
 
         // Executing sync
@@ -49,47 +50,27 @@ class SyncAlertCommand extends ContainerAwareCommand
         // Showing when the script is over
         $now = new \DateTime();
 
-        if ($output->getVerbosity() >= OutputInterface::VERBOSITY_VERY_VERBOSE)
+        if ($output->getVerbosity() >= OutputInterface::VERBOSITY_VERBOSE)
             $output->writeln('<comment>End : ' . $now->format('d-m-Y G:i:s') . ' ---</comment>');
     }
 
     /**
-     * @param InputInterface  $input
+     * @param InputInterface $input
      * @param OutputInterface $output
-     *
-     * @return void
      */
     protected function sync(InputInterface $input, OutputInterface $output)
     {
-        /** @var EntityManager $em */
-        $em = $this->getContainer()->get('doctrine')->getManager();
+        /** @var Synchroniser $synchroniser */
+        $synchroniser = $this->getContainer()->get('synchroniser');
+        $synchroniser->setOutput($output);
 
-        // Sync Tweets
-        $username = "officialmcafee";
-        $tweets = $this->getContainer()->get('twitter.wrapper')->getLastUserTweets($username);
+        // Sync twitter alert
+        $synchroniser->syncTwitterAlert();
 
-        foreach($tweets as $tweet){
-            if (array_key_exists('id_str', $tweet)){
-                $alert = $em->getRepository('AppBundle:Alert\TwitterAlert')->findOneBy(array(
-                   "originalId" => $tweet['id_str']
-                ));
+        // Sync coins
+        $synchroniser->syncCoins();
 
-                if (!$alert){
-                    $alert = new TwitterAlert();
-
-                    $em->persist($alert);
-                }
-
-
-                $alert->setOriginalId($tweet['id_str']);
-                $alert->setValue($tweet['text']);
-                $alert->setAuthor($username);
-                $alert->setUrl("https://twitter.com/anyuser/status/" . $alert->getOriginalId());
-
-                $em->flush();
-            }
-        }
-
-        $em->flush();
+        // Sync prices
+        $synchroniser->syncPrices();
     }
 }
