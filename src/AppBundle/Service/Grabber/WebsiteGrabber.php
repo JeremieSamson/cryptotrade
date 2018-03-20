@@ -7,14 +7,53 @@ namespace AppBundle\Service\Grabber;
  */
 class WebsiteGrabber
 {
-    public function parse($url){
-        $dom = new \DOMDocument();
-        $dom->loadHTML($this->getHtml($url));
+    /**
+     * @param $url
+     * @param $tagName
+     * @param $className
+     *
+     * @return \DOMElement|null
+     */
+    public function getElementsByClassName($url, $tagName, $className){
+        $dom = $this->getDomDocument($url);
 
-        return $dom->getElementsByTagName("main_body");
+        if ($dom) {
+            $xpath = new \DOMXpath($dom);
+            $tags = $xpath->query("//" . $tagName . "[@class=\"$className\"]");
+
+            return $tags->item(0);
+        } else {
+            var_dump("pas dom");
+        }
+
+        return null;
     }
 
-    public function getHtml($url){
+    /**
+     * @param $url
+     * @return \DOMDocument|null
+     */
+    public function getDomDocument($url){
+        $dom = new \DOMDocument();
+
+        $internalErrors = libxml_use_internal_errors(true);
+
+        try {
+            $dom->loadHTML($this->getHtml($url));
+        }catch (\Exception $exception){
+            $dom = null;
+        }
+
+        libxml_use_internal_errors($internalErrors);
+
+        return $dom;
+    }
+
+    /**
+     * @param $url
+     * @return mixed
+     */
+    private function getHtml($url){
         $ch = curl_init();
 
         curl_setopt($ch, CURLOPT_URL, $url);

@@ -16,6 +16,10 @@ use Doctrine\ORM\Mapping as ORM;
  */
 class CryptoCurrency
 {
+    const BTC_ACRONYM = "BTC";
+    const LTC_ACRONYM = "LTC";
+    const ETH_ACRONYM = "ETH";
+
     use TimestampableTrait;
 
     /**
@@ -40,6 +44,13 @@ class CryptoCurrency
      * @ORM\Column(name="value", type="float")
      */
     private $value;
+
+    /**
+     * @var integer
+     *
+     * @ORM\Column(name="decimals", type="integer")
+     */
+    private $decimals;
 
     /**
      * @var string
@@ -70,12 +81,20 @@ class CryptoCurrency
     private $sells;
 
     /**
+     * @var ArrayCollection
+     *
+     * @ORM\OneToMany(targetEntity="AppBundle\Entity\BlockChainAddress", mappedBy="cryptoCurrency")
+     */
+    private $blockchainAddresses;
+
+    /**
      * CryptoCurrency constructor.
      */
     public function __construct()
     {
         $this->orders = new ArrayCollection();
         $this->sells = new ArrayCollection();
+        $this->blockchainAddresses = new ArrayCollection();
     }
 
     /**
@@ -271,6 +290,53 @@ class CryptoCurrency
      */
     public function getHoldingCryptoAmount(){
         return $this->holdingCryptoAmount;
+    }
+
+    /**
+     * @return int
+     */
+    public function getDecimals()
+    {
+        return $this->decimals;
+    }
+
+    /**
+     * @param int $decimals
+     */
+    public function setDecimals($decimals)
+    {
+        $this->decimals = $decimals;
+    }
+
+    /**
+     * @param BlockchainAddress $address
+     *
+     * @return $this
+     */
+    public function addBlockchainAddress(BlockchainAddress $address){
+        $this->blockchainAddresses->add($address);
+
+        $address->setCryptoCurrency($this);
+
+        return $this;
+    }
+
+    /**
+     * @param BlockchainAddress $address
+     *
+     * @return $this
+     */
+    public function removeBlockchainAddress(BlockchainAddress $address){
+        $this->blockchainAddresses->removeElement($address);
+
+        return $this;
+    }
+
+    /**
+     * @return ArrayCollection
+     */
+    public function getBlockchainAddresss(){
+        return $this->blockchainAddresses;
     }
 }
 

@@ -1,0 +1,41 @@
+{% extends '::content.html.twig' %}
+
+{% block content_title %}Settings{% endblock %}
+
+{% block panel %}
+    <h2>Dashboard</h2>
+
+    {% for key, value in app.user.setting.settings %}
+        {{ key }} <input type="checkbox" {% if value %}checked{% endif %} name="{{ key }}">
+    {% endfor %}
+
+{% endblock %}
+
+{% block content_js %}
+    <script>
+        $(function() {
+            $(':checkbox').bootstrapToggle({
+                on: 'Oui',
+                off: 'Non',
+                size: 'mini'
+            });
+
+            $(':checkbox').change(function() {
+               console.log('Toggle: ' + $(this).prop('checked'));
+
+               var name = $(this).attr('name');
+               var url = '{{ path('settings_dashboard_toogle', {'value' : 'default_value', 'attribute' : 'default_attribute'})}}';
+               url = url.replace('default_value', $(this).prop('checked'));
+               url = url.replace('default_attribute', name);
+
+               $.get(url, function( data ) {
+                    $( ".result" ).html( data );
+               });
+            })
+        });
+
+        $( document ).ready(function() {
+
+        });
+    </script>
+{% endblock %}

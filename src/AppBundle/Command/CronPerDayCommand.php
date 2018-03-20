@@ -2,22 +2,12 @@
 
 namespace AppBundle\Command;
 
-use AppBundle\Entity\Alert\TwitterAlert;
 use AppBundle\Service\Synchroniser;
-use Doctrine\ORM\EntityManager;
-use MainBundle\Entity\BonDeLivraison;
-use MainBundle\Entity\Chantier;
-use MainBundle\Entity\Invoice;
-use MainBundle\Entity\Log;
-use MainBundle\Entity\Questionnaire;
-use MainBundle\Entity\Verification;
-use MediaBundle\Entity\GalleryHasMedia;
-use MediaBundle\Entity\Media;
 use Symfony\Bundle\FrameworkBundle\Command\ContainerAwareCommand;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
 
-class SyncAlertCommand extends ContainerAwareCommand
+class CronPerDayCommand extends ContainerAwareCommand
 {
     /**
      * Configure the command
@@ -25,8 +15,8 @@ class SyncAlertCommand extends ContainerAwareCommand
     public function configure()
     {
         $this
-            ->setName('cryptobox:sync')
-            ->setDescription('Sync alerts')
+            ->setName('cryptobox:cron:day')
+            ->setDescription('Sync provider prices')
         ;
     }
 
@@ -64,13 +54,13 @@ class SyncAlertCommand extends ContainerAwareCommand
         $synchroniser = $this->getContainer()->get('synchroniser');
         $synchroniser->setOutput($output);
 
-        // Sync twitter alert
-        $synchroniser->syncTwitterAlert();
+        // Sync miner prices
+        $synchroniser->syncMinersPrice();
 
-        // Sync coins
-        $synchroniser->syncCoins();
+        // Get last ebay sell
+        $synchroniser->getLastEbayPrice();
 
-        // Sync prices
-        $synchroniser->syncPrices();
+        // Sync transactions on specific address
+        $synchroniser->syncTransaction();
     }
 }

@@ -24,6 +24,20 @@ class UserFixtures extends AbstractFixture
         $user->setUsername("user");
         $user->setPlainPassword("user");
         $user->addRole(User::ROLE_DEFAULT);
+        $this->addReference('user_user', $user);
+
+        $manager->persist($user);
+
+        // Create admin user
+        $user = new User();
+        $user->setEnabled(1);
+
+        $email = "admin@cryptobox.com";
+        $user->setEmail($email);
+        $user->setUsername("admin");
+        $user->setPlainPassword("admin");
+        $user->addRole(User::ROLE_SUPER_ADMIN);
+        $this->addReference('user_admin', $user);
 
         $manager->persist($user);
 

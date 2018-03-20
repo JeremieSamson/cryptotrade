@@ -1,0 +1,10 @@
+admin:
+    miner:
+        list:
+          hashrate_unite: Hashrate
+
+front:
+    menu:
+        profile: User Profile
+    title:
+        profile: Profile

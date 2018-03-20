@@ -24,3 +24,5 @@ parameters:
     twitter_access_token: ~
     twitter_access_token_secret: ~
 
+    # EtherScan
+    etherscan_api_token: ~

@@ -16,6 +16,8 @@
     <!-- Custom Fonts -->
     <link href="{{ asset('bundles/app/font-awesome/css/font-awesome.min.css') }}" rel="stylesheet" type="text/css">
 
+    <link href="https://gitcdn.github.io/bootstrap-toggle/2.2.2/css/bootstrap-toggle.min.css" rel="stylesheet">
+
     <!-- HTML5 Shim and Respond.js IE8 support of HTML5 elements and media queries -->
     <!-- WARNING: Respond.js doesn't work if you view the page via file:// -->
     <!--[if lt IE 9]>
@@ -36,7 +38,7 @@
      <div id="wrapper">
          {% include '::navbar.html.twig' %}
 
-        <div id="page-wrapper">
+        <div id="page-wrapper" style="{% if not app.user %}margin:0px;{% endif %}">
             {% block content %}{% endblock %}
         </div>
     </div>
@@ -58,4 +60,6 @@
 
     <!-- Custom Theme JavaScript -->
     <script src="{{ asset('bundles/app/js/sb-admin-2.min.js') }}"></script>
+
+    <script src="https://gitcdn.github.io/bootstrap-toggle/2.2.2/js/bootstrap-toggle.min.js"></script>
 {% endblock %}

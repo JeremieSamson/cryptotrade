@@ -2,6 +2,7 @@ imports:
     - { resource: parameters.yml }
     - { resource: security.yml }
     - { resource: services.yml }
+    - { resource: services_admin.yml }
 
 # Put parameters here that don't need to change on each machine where the app is deployed
 # https://symfony.com/doc/current/best_practices/configuration.html#application-related-configuration
@@ -10,7 +11,7 @@ parameters:
 
 framework:
     #esi: ~
-    #translator: { fallbacks: ['%locale%'] }
+    translator: { fallbacks: ['%locale%'] }
     secret: '%secret%'
     router:
         resource: '%kernel.project_dir%/app/config/routing.yml'
@@ -39,6 +40,7 @@ twig:
     strict_variables: '%kernel.debug%'
     globals:
         coincapwrapper: '@coincap.wrapper'
+        currencywrapper: '@trade.currency.wrapper'
 
 # Doctrine Configuration
 doctrine:
@@ -85,3 +87,14 @@ endroid_twitter:
     consumer_secret: '%twitter_consumer_secret%'
     access_token: '%twitter_access_token%'
     access_token_secret: '%twitter_access_token_secret%'
+
+# Sonata Admin
+sonata_admin:
+    title: CryptoBox
+
+sonata_block:
+    default_contexts: [cms]
+    blocks:
+        # enable the SonataAdminBundle block
+        sonata.admin.block.admin_list:
+            contexts: [admin]

@@ -28,9 +28,13 @@ services:
         class: AppBundle\Service\Helper\BlockChainInfoHelper
         arguments: ['@coincap.helper']
 
+    etherscan.helper:
+        class: AppBundle\Service\Helper\EtherScanHelper
+        arguments: ['%etherscan_api_token%']
+
     synchroniser:
         class: AppBundle\Service\Synchroniser
-        arguments: ['@cryptobox.entity_manager', '@twitter.wrapper', '@coincap.wrapper']
+        arguments: ['@cryptobox.entity_manager', '@twitter.wrapper', '@coincap.wrapper', '@global.websitegrabber', '@etherscan.helper']
 
     cryptobox.entity_manager:
         class: AppBundle\Service\EntityManager

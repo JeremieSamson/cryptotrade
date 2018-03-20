@@ -19,7 +19,6 @@ class AlertController extends Controller
     {
         $alerts = $this->getDoctrine()->getRepository('AppBundle:Alert\TwitterAlert')->findAll();
 
-        // replace this example code with whatever you need
         return $this->render('AppBundle:alert:index.html.twig', array(
             "alerts" => $alerts
         ));

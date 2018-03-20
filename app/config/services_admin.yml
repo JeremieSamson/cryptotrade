@@ -1,0 +1,54 @@
+services:
+    sonata.admin.miner:
+        class: AppBundle\Admin\MinerAdmin
+        tags:
+            - { name: sonata.admin, manager_type: orm, group: "Mining", label: "Miner" }
+        arguments:
+            - ~
+            - AppBundle\Entity\Miner
+            - ~
+
+    sonata.admin.provider:
+        class: AppBundle\Admin\ProviderAdmin
+        tags:
+            - { name: sonata.admin, manager_type: orm, group: "Mining", label: "Provider" }
+        arguments:
+            - ~
+            - AppBundle\Entity\Provider
+            - ~
+
+    sonata.admin.historic:
+        class: AppBundle\Admin\HistoricAdmin
+        tags:
+            - { name: sonata.admin, manager_type: orm, group: "Journal", label: "Historic" }
+        arguments:
+            - ~
+            - AppBundle\Entity\Historic
+            - ~
+
+    sonata.admin.ebaySell:
+        class: AppBundle\Admin\EbaySellAdmin
+        tags:
+            - { name: sonata.admin, manager_type: orm, group: "Journal", label: "Ebay Sell" }
+        arguments:
+            - ~
+            - AppBundle\Entity\EbaySell
+            - ~
+
+    sonata.admin.rig:
+        class: AppBundle\Admin\RigAdmin
+        tags:
+            - { name: sonata.admin, manager_type: orm, group: "Mining", label: "Rig" }
+        arguments:
+            - ~
+            - AppBundle\Entity\Rig
+            - ~
+
+    sonata.admin.transaction:
+        class: AppBundle\Admin\TransactionAdmin
+        tags:
+            - { name: sonata.admin, manager_type: orm, group: "Mining", label: "Transaction" }
+        arguments:
+            - ~
+            - AppBundle\Entity\Transaction
+            - ~
