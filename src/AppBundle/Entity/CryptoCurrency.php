@@ -20,6 +20,8 @@ class CryptoCurrency
     const LTC_ACRONYM = "LTC";
     const ETH_ACRONYM = "ETH";
 
+    const ETH_ADDRESSES_READER = "https://etherscan.io/address";
+
     use TimestampableTrait;
 
     /**

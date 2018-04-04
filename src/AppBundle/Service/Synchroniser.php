@@ -2,7 +2,9 @@
 
 namespace AppBundle\Service;
 
+use AppBundle\Entity\Alert\TransactionAlert;
 use AppBundle\Entity\Alert\TwitterAlert;
+use AppBundle\Entity\BlockchainAddress;
 use AppBundle\Entity\CryptoCurrency;
 use AppBundle\Entity\EbaySell;
 use AppBundle\Entity\Historic;
@@ -12,6 +14,7 @@ use AppBundle\Entity\Transaction;
 use AppBundle\Service\Grabber\WebsiteGrabber;
 use AppBundle\Service\Helper\EtherScanHelper;
 use AppBundle\Service\Wrapper\CoinCapWrapper;
+use AppBundle\Service\Wrapper\OutputWrapper;
 use AppBundle\Service\Wrapper\TwitterWrapper;
 use Symfony\Component\Console\Output\Output;
 use Symfony\Component\Console\Output\OutputInterface;
@@ -27,7 +30,7 @@ class Synchroniser
     /** @var TwitterWrapper */
     private $twitterWrapper;
 
-    /** @var Output */
+    /** @var OutputWrapper */
     private $output;
 
     /** @var CoinCapWrapper */
@@ -45,18 +48,19 @@ class Synchroniser
      * @param EntityManager $em
      * @param TwitterWrapper $twitterWrapper
      */
-    public function __construct(EntityManager $em, TwitterWrapper $twitterWrapper, CoinCapWrapper $coinCapWrapper, WebsiteGrabber $grabber, EtherScanHelper $etherScanHelper){
+    public function __construct(EntityManager $em, OutputWrapper $output, TwitterWrapper $twitterWrapper, CoinCapWrapper $coinCapWrapper, WebsiteGrabber $grabber, EtherScanHelper $etherScanHelper){
         $this->em = $em;
         $this->twitterWrapper = $twitterWrapper;
         $this->coinCapWrapper = $coinCapWrapper;
         $this->grabber = $grabber;
         $this->etherScanHelper = $etherScanHelper;
+        $this->output = $output;
     }
 
     /**
      * @param OutputInterface $output
      */
-    public function setOutput(OutputInterface $output){$this->output = $output;}
+    public function setOutput(OutputInterface $output){$this->output->setOutputInterface($output);}
 
     /**
      * Sync aller alerts from Twitter
@@ -304,76 +308,102 @@ class Synchroniser
      * Sync all rigs transactions
      */
     public function syncTransaction(){
+        $nbTransactionsCreated = $nbTransactionsPassed = $nbAddressesCreated = $nbAddressesPassed = 0;
+
         $rigs = $this->em->getRepository('AppBundle:Rig')->findAll();
 
-        $this->writln(count($rigs) . " rig(s) found");
+        $this->output->writelnVerboseComment(count($rigs) . " rig(s) found");
+
+        /** @var CryptoCurrency $eth */
+        $eth = $this->em->getRepository('AppBundle:CryptoCurrency')->findOneBy(array("acronym" => "ETH"));
 
         /** @var Rig $rig */
         foreach ($rigs as $rig){
-            /** @var CryptoCurrency $eth */
-            $eth = $this->em->getRepository('AppBundle:CryptoCurrency')->findOneBy(array("acronym" => "ETH"));
+            $blockchainAddresses =$rig->getBlockchainAddresses();
 
-            /** @var EthAddress $rigAddress */
-            $rigAddress = $rig->getEthAddress();
+            $this->output->writelnVerboseComment($blockchainAddresses->count() . " addresses(s) found on rig " . $rig->getName());
 
-            $transactions = $this->etherScanHelper->getTransactions($rigAddress->getAddress());
+            /** @var BlockchainAddress $blockchainAddress */
+            foreach ($blockchainAddresses as $blockchainAddress) {
+                $transactions = $this->etherScanHelper->getTransactions($blockchainAddress->getAddress());
 
-            $this->writln(count($transactions) . " transaction(s) found on rig " . $rig->getName());
+                $this->output->writelnVerboseComment(count($transactions) . " transaction(s) found on rig  " .$rig->getName(). " and addresses " .$blockchainAddress->getAddress() );
 
-            foreach ($transactions as $etherScanTransaction){
-                /** @var EthAddress $toAddress */
-                $toAddress = $this->em->getRepository('AppBundle:EthAddress')->findOneBy(array("address" => $etherScanTransaction['to']));
+                foreach ($transactions as $etherScanTransaction){
+                    /** @var BlockchainAddress $toAddress */
+                    $toAddress = $this->em->getRepository('AppBundle:BlockchainAddress')->findOneBy(array("address" => $etherScanTransaction['to']));
 
-                if (!$toAddress){
-                    var_dump("new");
-                    $toAddress = new EthAddress();
-                    $toAddress->setName("N/A");
-                    $toAddress->setAddress($etherScanTransaction['to']);
+                    if (!$toAddress){
+                        $toAddress = new BlockchainAddress();
+                        $toAddress->setName("N/A");
+                        $toAddress->setAddress($etherScanTransaction['to']);
 
-                    $this->writln("New Address created");
+                        $this->output->writelnVeryVerboseComment("New Address created");
 
-                    $this->em->persist($toAddress);
-                }else{
-                    var_dump($toAddress->getName());
-                }
+                        $nbAddressesCreated++;
 
-                /** @var EthAddress $fromAddress */
-                $fromAddress = $this->em->getRepository('AppBundle:EthAddress')->findOneBy(array("address" => $etherScanTransaction['from']));
+                        $this->em->persist($toAddress);
+                    } else {
+                        $nbAddressesPassed++;
+                    }
 
-                if (!$fromAddress){
-                    var_dump("new");
-                    $fromAddress = new EthAddress();
-                    $fromAddress->setName("N/A");
-                    $fromAddress->setAddress($etherScanTransaction['from']);
+                    /** @var BlockchainAddress $fromAddress */
+                    $fromAddress = $this->em->getRepository('AppBundle:BlockchainAddress')->findOneBy(array("address" => $etherScanTransaction['from']));
 
-                    $this->writln("New Address created");
+                    if (!$fromAddress){
+                        $fromAddress = new BlockchainAddress();
+                        $fromAddress->setName("N/A");
+                        $fromAddress->setAddress($etherScanTransaction['from']);
 
-                    $this->em->persist($fromAddress);
-                }else{
-                    var_dump($fromAddress->getName());
-                }
+                        $this->output->writelnVeryVerboseComment("New Address created");
 
-                /** @var Transaction $transaction */
-                $transaction = $this->em->getRepository('AppBundle:Transaction')->findOneBy(array("hash" => $etherScanTransaction['hash']));
+                        $nbAddressesCreated++;
 
-                if (!$transaction){
-                    $transaction = new Transaction();
-                    $transaction->setValue($etherScanTransaction['value'] / pow(10, $eth->getDecimals()));
-                    $transaction->setHash($etherScanTransaction['hash']);
-                    $transaction->setTimeStamp(new \DateTime("@".$etherScanTransaction['timeStamp']));
-                    $transaction->setGas($etherScanTransaction['gas']);
+                        $this->em->persist($fromAddress);
+                    } else {
+                        $nbAddressesPassed++;
+                    }
 
-                    $toAddress->addToTransaction($transaction);
-                    $fromAddress->addFromTransaction($transaction);
+                    /** @var Transaction $transaction */
+                    $transaction = $this->em->getRepository('AppBundle:Transaction')->findOneBy(array("hash" => $etherScanTransaction['hash']));
 
-                    $this->writln("New Transaction created");
+                    if (!$transaction){
+                        $transaction = new Transaction();
+                        $transaction->setValue($etherScanTransaction['value'] / pow(10, $eth->getDecimals()));
+                        $transaction->setHash($etherScanTransaction['hash']);
+                        $transaction->setTimeStamp(new \DateTime("@".$etherScanTransaction['timeStamp']));
+                        $transaction->setGas($etherScanTransaction['gas']);
 
-                    $this->em->persist($transaction);
+                        $toAddress->addToTransaction($transaction);
+                        $fromAddress->addFromTransaction($transaction);
+
+                        $this->output->writelnVeryVerboseComment("New Transaction created");
+
+                        $nbTransactionsCreated++;
+
+                        $this->em->persist($transaction);
+
+                        $alert = new TransactionAlert();
+                        $alert->setOriginalId($transaction->getHash());
+                        $alert->setValue($transaction->getValue());
+                        $alert->setUrl(CryptoCurrency::ETH_ADDRESSES_READER . "/" . $blockchainAddress->getAddress());
+
+                        $transaction->setAlert($alert);
+
+                        $this->em->persist($alert);
+                    } else {
+                        $nbTransactionsPassed++;
+                    }
                 }
             }
 
             $this->em->flush();
         }
+
+        $this->output->writelnVerboseComment("Nb Transaction(s) created : " . $nbTransactionsCreated);
+        $this->output->writelnVerboseComment("Nb Transaction(s) passed : " . $nbTransactionsPassed);
+        $this->output->writelnVerboseComment("Nb Addresse(s) created : " . $nbAddressesCreated);
+        $this->output->writelnVerboseComment("Nb Addresse(s) passed : " . $nbAddressesPassed);
     }
 
     /**
@@ -393,16 +423,5 @@ class Synchroniser
         $this->writln("New Historic for " . $miner->getName() . " => $value $unite", OutputInterface::VERBOSITY_VERY_VERBOSE);
 
         $this->em->persist($historic);
-    }
-
-    /**
-     * @param $msg
-     * @param int $verbosity
-     * @param string $type
-     */
-    private function writln($msg, $verbosity = OutputInterface::VERBOSITY_VERBOSE, $type = "comment"){
-        if ($this->output && $this->output->getVerbosity() >= $verbosity){
-            $this->output->writeln("<$type>$msg</$type>");
-        }
     }
 }

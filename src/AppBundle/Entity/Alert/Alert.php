@@ -10,8 +10,6 @@ use AppBundle\Entity\Traits\TimestampableTrait;
  */
 abstract class Alert
 {
-    use TimestampableTrait;
-
     /**
      * @var string
      *
@@ -32,6 +30,13 @@ abstract class Alert
      * @ORM\Column(name="url", type="string", length=255)
      */
     protected $url;
+
+    /**
+     * @var bool
+     *
+     * @ORM\Column(name="has_been_read", type="boolean")
+     */
+    protected $hasBeenRead = 0;
 
     /**
      * Set value
@@ -98,7 +103,31 @@ abstract class Alert
      */
     public function setOriginalId($id)
     {
-        return $this->originalId = $id;
+        $this->originalId = $id;
+    }
+
+    /**
+     * @return bool
+     */
+    public function isHasBeenRead()
+    {
+        return $this->hasBeenRead;
+    }
+
+    /**
+     * @return bool
+     */
+    public function hasBeenRead()
+    {
+        return $this->hasBeenRead;
+    }
+
+    /**
+     * @param bool $hasBeenRead
+     */
+    public function setHasBeenRead($hasBeenRead)
+    {
+        $this->hasBeenRead = $hasBeenRead;
     }
 }
 

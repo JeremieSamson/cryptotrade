@@ -2,6 +2,8 @@
 
 namespace AppBundle\Entity;
 
+use AppBundle\Entity\Alert\TransactionAlert;
+use AppBundle\Entity\Traits\AlertableTrait;
 use Doctrine\ORM\Mapping as ORM;
 
 /**
@@ -12,6 +14,9 @@ use Doctrine\ORM\Mapping as ORM;
  */
 class Transaction
 {
+
+    use AlertableTrait;
+
     /**
      * @var int
      *
@@ -62,6 +67,13 @@ class Transaction
      * @ORM\Column(name="hash", type="string", length=255)
      */
     private $hash;
+
+    /**
+     * @var TransactionAlert
+     *
+     * @ORM\OneToOne(targetEntity="AppBundle\Entity\Alert\TransactionAlert")
+     */
+    private $alert;
 
     /**
      * Get id
@@ -183,6 +195,22 @@ class Transaction
     public function setHash($hash)
     {
         $this->hash = $hash;
+    }
+
+    /**
+     * @return TransactionAlert
+     */
+    public function getAlert()
+    {
+        return $this->alert;
+    }
+
+    /**
+     * @param TransactionAlert $alert
+     */
+    public function setAlert($alert)
+    {
+        $this->alert = $alert;
     }
 }
 

@@ -2,9 +2,11 @@
 
 namespace UserBundle\Entity;
 
+use AppBundle\Entity\BlockchainAddress;
 use AppBundle\Entity\Holding;
 use AppBundle\Entity\Rig;
 use AppBundle\Entity\Setting;
+use AppBundle\Entity\Transaction;
 use Doctrine\Common\Collections\ArrayCollection;
 use FOS\UserBundle\Model\User as BaseUser;
 use Doctrine\ORM\Mapping as ORM;
@@ -168,6 +170,38 @@ class User extends BaseUser
     public function setSetting($setting)
     {
         $this->setting = $setting;
+    }
+
+    /**
+     * @return array
+     */
+    public function getAlerts(){
+        $alerts = array();
+
+        $now = new \DateTime();
+
+        /** @var Rig $rig */
+        foreach ($this->rigs as $rig){
+            /** @var BlockchainAddress $address */
+            foreach ($rig->getBlockchainAddresses() as $address){
+                /** @var Transaction $transaction */
+                foreach ($address->getToTransactions() as $transaction){
+                    if ($transaction->getAlert() && !$transaction->getAlert()->hasBeenRead()) {
+                        $diff = $now->diff($transaction->getAlert()->getCreatedAt());
+
+                        $minutes = $diff->days * 24 * 60;
+                        $minutes += $diff->h * 60;
+                        $minutes += $diff->i;
+
+                        $alerts[] = array(
+                            "diff" => $minutes,
+                        );
+                    }
+                }
+            }
+        }
+
+        return $alerts;
     }
 }
 

@@ -8,6 +8,7 @@ use JMS\Serializer\Annotation\Groups;
 
 /**
  * Trait TimestampableTrait
+ *
  */
 trait TimestampableTrait
 {
