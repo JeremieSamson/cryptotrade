@@ -22,7 +22,7 @@
     "require": {
         "php": ">=5.5.9",
         "coinbase/coinbase": "^2.5",
-        "doctrine/doctrine-bundle": "^1.6",
+        "doctrine/doctrine-bundle": "^1.7",
         "doctrine/orm": "^2.5",
         "endroid/twitter": "^1.3",
         "friendsofsymfony/user-bundle": "^2.0",
