@@ -11,7 +11,7 @@ sudo apt-get install apache2
 ### Install php
 
 ```shell
-sudo apt-get install php php-curl
+sudo apt-get install php7.2 php7.2-curl php7.2-mbstring php7.2-xml php7.2-mysql
 ```
 
 ### Install mysql
@@ -75,7 +75,7 @@ sudo setfacl -dR -m u:"$HTTPDUSER":rwX -m u:`whoami`:rwX var/cache var/logs var/
 3. Type Name, Description and Website
 4. Add Twitter consumer key, consumer secret, access token and access token secret in yout parameter.yml
  
-### Install [composer](https://getcomposer.org) if you don't have it :
+### Install [composer](https://getcomposer.org) 
  
  
 ```shell
