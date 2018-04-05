@@ -69,7 +69,7 @@ class Synchroniser
         $username = "officialmcafee";
         $tweets = $this->twitterWrapper->getLastUserTweets($username);
 
-        $this->writln(count($tweets) . " alerts found");
+        $this->output->writelnVerboseComment(count($tweets) . " alerts found");
 
         foreach($tweets as $tweet){
             if (array_key_exists('id_str', $tweet)){
@@ -80,7 +80,7 @@ class Synchroniser
                 if (!$alert){
                     $alert = new TwitterAlert();
 
-                    $this->writln("New twitter alert added");
+                    $this->output->writelnVerboseComment("New twitter alert added");
 
                     $this->em->persist($alert);
                 }
@@ -90,7 +90,7 @@ class Synchroniser
                 $alert->setAuthor($username);
                 $alert->setUrl("https://twitter.com/anyuser/status/" . $alert->getOriginalId());
 
-                $this->writln($alert->getOriginalId() . " updated", OutputInterface::VERBOSITY_VERY_VERBOSE);
+                $this->output->writelnVeryVerboseComment($alert->getOriginalId() . " updated");
             }
         }
 
@@ -103,7 +103,7 @@ class Synchroniser
     public function syncCoins(){
         $coins = $this->coinCapWrapper->getMap();
 
-        $this->writln(count($coins) . " coins found");
+        $this->output->writelnVerboseComment(count($coins) . " coins found");
 
         /**
          * {
@@ -128,12 +128,12 @@ class Synchroniser
                 $crypto->setAcronym($coin['symbol']);
                 $crypto->setValue(0);
 
-                $this->writln("New coin added " . $crypto->getAcronym());
+                $this->output->writelnVerboseComment("New coin added " . $crypto->getAcronym());
 
                 $this->em->persist($crypto);
             }
 
-            $this->writln($crypto->getAcronym() . " updated", OutputInterface::VERBOSITY_VERY_VERBOSE);
+            $this->output->writelnVeryVerboseComment($crypto->getAcronym() . " updated");
             $crypto->setName(empty($coin['name']) ? $coin['symbol'] : $coin['name']);
         }
 
@@ -147,7 +147,7 @@ class Synchroniser
     {
         $currencies = $this->em->getRepository("AppBundle:CryptoCurrency")->findAll();
 
-        $this->writln(count($currencies) . " coins found");
+        $this->output->writelnVerboseComment(count($currencies) . " coins found");
 
         /** @var CryptoCurrency $currency */
         foreach($currencies as $currency) {
@@ -155,12 +155,12 @@ class Synchroniser
                 $value = $this->coinCapWrapper->getPrice($currency);
 
                 if (is_float($value)) {
-                    $this->writln($currency->getAcronym() . " value updated from " . $currency->getValue() . " to " . $value, OutputInterface::VERBOSITY_VERY_VERBOSE);
+                    $this->output->writelnVeryVerboseComment($currency->getAcronym() . " value updated from " . $currency->getValue() . " to " . $value);
 
                     $currency->setValue($value);
                 }
             }catch(\Exception $e){
-                $this->writln("Can't get current price of " . $currency->getAcronym() . " : " . $e->getMessage(), OutputInterface::VERBOSITY_VERBOSE, "error");
+                $this->output->writelnVeryVerboseError("Can't get current price of " . $currency->getAcronym() . " : " . $e->getMessage());
             }
 
             $this->em->flush();
@@ -174,7 +174,7 @@ class Synchroniser
     {
         $miners = $this->em->getRepository("AppBundle:Miner")->findAll();
 
-        $this->writln(count($miners) . " miner(s) found");
+        $this->output->writelnVerboseComment(count($miners) . " miner(s) found");
 
         /** @var Miner $miner */
         foreach($miners as $miner) {
@@ -185,7 +185,7 @@ class Synchroniser
             );
 
             if (!$tag){
-                $this->writln("Error during website importation for " . $miner->getName(), OutputInterface::VERBOSITY_VERBOSE, "error");
+                $this->output->writelnVeryVerboseError("Error during website importation for " . $miner->getName());
                 continue;
             }
 
@@ -241,7 +241,7 @@ class Synchroniser
     public function getLastEbayPrice(){
         $miners = $this->em->getRepository("AppBundle:Miner")->findAll();
 
-        $this->writln(count($miners) . " miner(s) found");
+        $this->output->writelnVerboseComment(count($miners) . " miner(s) found");
 
         /** @var Miner $miner */
         foreach($miners as $miner) {
