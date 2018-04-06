@@ -195,6 +195,8 @@ class User extends BaseUser
 
                         $alerts[] = array(
                             "diff" => $minutes,
+                            "value" => $transaction->getValue(),
+                            "unity" => $address->getCryptoCurrency()->getAcronym()
                         );
                     }
                 }

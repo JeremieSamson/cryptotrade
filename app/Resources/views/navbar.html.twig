@@ -122,7 +122,9 @@
                             <a href="#">
                                 <div>
                                     <i class="fa fa-exchange"></i> &nbsp; New Transaction
-                                    <span class="pull-right text-muted small">{{ alert['diff'] }} minutes ago</span>
+                                    <span class="pull-right text-muted small">{{ alert.diff }} minutes ago</span>
+                                    <br>
+                                    <span class="pull-left text-muted small" style="color: green;">{{ alert.value|round(4) }} {{ alert.unity }}</span><br>
                                 </div>
                             </a>
                         </li>

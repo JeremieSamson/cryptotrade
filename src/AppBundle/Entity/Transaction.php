@@ -4,6 +4,7 @@ namespace AppBundle\Entity;
 
 use AppBundle\Entity\Alert\TransactionAlert;
 use AppBundle\Entity\Traits\AlertableTrait;
+use AppBundle\Entity\Traits\TimestampableTrait;
 use Doctrine\ORM\Mapping as ORM;
 
 /**
@@ -11,11 +12,12 @@ use Doctrine\ORM\Mapping as ORM;
  *
  * @ORM\Table(name="transaction")
  * @ORM\Entity(repositoryClass="AppBundle\Repository\TransactionRepository")
+ *
+ * @ORM\HasLifecycleCallbacks()
  */
 class Transaction
 {
-
-    use AlertableTrait;
+    use AlertableTrait, TimestampableTrait;
 
     /**
      * @var int

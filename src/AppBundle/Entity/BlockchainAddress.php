@@ -60,6 +60,7 @@ class BlockchainAddress
      * @var ArrayCollection
      *
      * @ORM\OneToMany(targetEntity="AppBundle\Entity\Transaction", mappedBy="toAddress")
+     * @ORM\OrderBy({"createdAt" = "desc"})
      */
     private $toTransactions;
 

@@ -45,8 +45,8 @@ set :model_manager,         "doctrine"
 set :interactive_mode,      false
 set :dump_assetic_assets,   false
 set :shared_files,          ["#{app_path}/config/parameters.yml"]
-set :writable_dirs,         ["#{var_path}/logs", "#{var_path}/cache", "#{var_path}/sessions"]
-set :shared_children,       ["#{var_path}/logs"]
+set :writable_dirs,         ["#{var_path}/logs", "#{var_path}/cache", "#{var_path}/sessions", "#{var_path}/cron"]
+set :shared_children,       ["#{var_path}/logs", "#{var_path}/cron"]
 
 logger.level = Logger::MAX_LEVEL
 
