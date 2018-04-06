@@ -1,5 +1,5 @@
 # Branch dev from git
-set :current_stage, "dev"
+set :branch, "dev"
 
 # Directory on the server
 set :deploy_to, "/var/www/dev.cryptobox.tech"
