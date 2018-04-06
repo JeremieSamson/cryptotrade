@@ -55,10 +55,10 @@ class CronPerDayCommand extends ContainerAwareCommand
         $synchroniser->setOutput($output);
 
         // Sync miner prices
-        //$synchroniser->syncMinersPrice();
+        $synchroniser->syncMinersPrice();
 
         // Get last ebay sell
-        //$synchroniser->getLastEbayPrice();
+        $synchroniser->getLastEbayPrice();
 
         // Sync transactions on specific address
         $synchroniser->syncTransaction();
